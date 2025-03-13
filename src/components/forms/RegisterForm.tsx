@@ -28,6 +28,9 @@ const registerSchema = z
     confirmarSenha: z
       .string()
       .min(6, "A confirmação de senha deve ter pelo menos 6 caracteres"),
+    termos: z.boolean().refine((val) => val === true, {
+      message: "Você deve aceitar os termos de uso",
+    }),
   })
   .refine((data) => data.senha === data.confirmarSenha, {
     message: "As senhas não coincidem",
@@ -71,7 +74,7 @@ export default function RegisterForm() {
         <Navbar />
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+      <div className="bg-white p-6 rounded-lg shadow-lg mx-auto max-w-md sm:max-w-lg">
         <h2 className="text-2xl font-semibold mb-4 text-[#2D5D34] text-center">
           Criar Conta
         </h2>
@@ -91,7 +94,7 @@ export default function RegisterForm() {
               className="w-full p-2 border rounded mt-1 text-[#2D5D34]"
             />
             {errors.nome && (
-              <p className="text-red-500 text-sm">{errors.nome.message}</p>
+              <p className="text-red-500 text-sm mb-1">{errors.nome.message}</p>
             )}
           </div>
           <div>
@@ -128,56 +131,74 @@ export default function RegisterForm() {
               <p className="text-red-500 text-sm">{errors.email.message}</p>
             )}
           </div>
-          <div>
-            <label
-              htmlFor="senha"
-              className="block text-sm font-medium text-[#2D5D34]"
-            >
-              Senha
-            </label>
-            <input
-              id="senha"
-              type="password"
-              {...register("senha")}
-              className="w-full p-2 border rounded mt-1 text-[#2D5D34]"
-              onChange={(e) => setSenhaDigitada(e.target.value)}
-            />
-            {senhaDigitada.length > 0 && (
-              <p className="text-sm text-gray-500 mt-2">
-                A senha deve ter pelo menos 6 caracteres e um caractere
-                especial.
-              </p>
-            )}
-            {errors.senha && (
-              <p className="text-red-500 text-sm">{errors.senha.message}</p>
-            )}
-          </div>
-          <div>
-            <label
-              htmlFor="confirmarSenha"
-              className="block text-sm font-medium text-[#2D5D34]"
-            >
-              Confirmar Senha
-            </label>
-            <input
-              id="confirmarSenha"
-              type="password"
-              {...register("confirmarSenha")}
-              className="w-full p-2 border rounded mt-1 text-[#2D5D34]"
-              onChange={(e) => setConfirmarSenhaDigitada(e.target.value)}
-            />
-            {confirmarSenhaDigitada.length > 0 &&
-              senhaDigitada !== confirmarSenhaDigitada && (
-                <p className="text-sm text-gray-500">
-                  As senhas devem coincidir.
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label
+                htmlFor="senha"
+                className="block text-sm font-medium text-[#2D5D34]"
+              >
+                Senha
+              </label>
+              <input
+                id="senha"
+                type="password"
+                {...register("senha")}
+                className="w-full p-2 border rounded text-[#2D5D34]"
+                onChange={(e) => setSenhaDigitada(e.target.value)}
+              />
+              {senhaDigitada.length > 0 && (
+                <p className="text-sm text-gray-500 mt-1">
+                  A senha deve ter pelo menos 6 caracteres e um caractere
+                  especial.
                 </p>
               )}
-            {errors.confirmarSenha && (
-              <p className="text-red-500 text-sm">
-                {errors.confirmarSenha.message}
-              </p>
-            )}
+              {errors.senha && (
+                <p className="text-red-500 text-sm">{errors.senha.message}</p>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="confirmarSenha"
+                className="block text-sm font-medium text-[#2D5D34]"
+              >
+                Confirmar Senha
+              </label>
+              <input
+                id="confirmarSenha"
+                type="password"
+                {...register("confirmarSenha")}
+                className="w-full p-2 border rounded text-[#2D5D34]"
+                onChange={(e) => setConfirmarSenhaDigitada(e.target.value)}
+              />
+              {confirmarSenhaDigitada.length > 0 &&
+                senhaDigitada !== confirmarSenhaDigitada && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    As senhas devem coincidir.
+                  </p>
+                )}
+              {errors.confirmarSenha && (
+                <p className="text-red-500 text-sm">
+                  {errors.confirmarSenha.message}
+                </p>
+              )}
+            </div>
           </div>
+
+          <div className="flex items-center space-x-2">
+            <input
+              id="termos"
+              type="checkbox"
+              {...register("termos")}
+              className="text-[#2D5D34]"
+            />
+            <label htmlFor="termos" className="text-sm text-[#2D5D34]">
+              Concordo com os{" "}
+              <a href="/terms" className="text-[#5C8A59] underline">
+                Termos e Condições
+              </a>
+            </label>
+          </div>
+
           <button
             type="submit"
             className="w-full bg-[#5C8A59] text-white p-2 rounded hover:bg-[#2D5D34]"
@@ -185,6 +206,7 @@ export default function RegisterForm() {
             Criar Conta
           </button>
         </form>
+
         <p className="text-sm mt-4 text-center text-gray-600">
           Já tem uma conta?{" "}
           <a href="/login" className="text-[#2D5D34]">
